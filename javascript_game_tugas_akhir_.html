@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Tugas Akhir JavaScript GameDev</title>
+	<title>Tugas Akhir JavaScript Gamedev</title>
 	<style>
 		body{
 			display:  flex;
@@ -26,9 +26,9 @@
 		var ctx = canvas.getContext("2d");
 
 			var triangle = {
-			x: 150,
-			y: 150,
-			padding: 150,
+			x: 100,
+			y: 100,
+			padding: 100,
 			vx: 5,
 
 			color: 'blue',
@@ -44,8 +44,30 @@
 			}
 		};
 
-		ctx.translate(-70, 420);
+		ctx.translate(-70, 550);
 		triangle.draw();
+
+		//musuh berbentuk pentagon
+		var pentagon = {
+			x: 0,
+			y: 0,
+
+			color: 'purple',
+
+			draw: function(radius) {
+				ctx.beginPath();
+				ctx.lineTo(this.x + 150, this.y + 100); //sudut ke-1
+				ctx.lineTo(this.x + 245, this.y + 169); //sudut ke-2
+				ctx.lineTo(this.x + 209, this.y + 281); //sudut ke-3
+				ctx.lineTo(this.x + 91, this.y + 281); //sudut ke-4
+				ctx.lineTo(this.x + 55, this.y + 169); //sudut ke-5
+				ctx.closePath();
+				ctx.fillStyle = this.color;
+				ctx.fill();
+			}
+		};
+		ctx.translate(780, -550);
+		pentagon.draw();
 
 		//menambahkan event listener down
 		window.addEventListener('keydown', (e) => {
@@ -70,27 +92,9 @@
 			triangle.draw();
 		});
 
-		//musuh berbentuk pentagon
-		var pentagon = {
-			x: 0,
-			y: 0,
-
-			color: 'purple',
-
-			draw: function(radius) {
-				ctx.beginPath();
-				ctx.lineTo(this.x + 150, this.y + 100); //sudut ke-1
-				ctx.lineTo(this.x + 245, this.y + 169); //sudut ke-2
-				ctx.lineTo(this.x + 209, this.y + 281); //sudut ke-3
-				ctx.lineTo(this.x + 91, this.y + 281); //sudut ke-4
-				ctx.lineTo(this.x + 55, this.y + 169); //sudut ke-5
-				ctx.closePath();
-				ctx.fillStyle = this.color;
-				ctx.fill();
-			}
-		};
-		ctx.translate(780, -450);
-		pentagon.draw();
+		ctx.fillStyle = "black";
+		ctx.font = '25px Arial';
+		ctx.fillText('High Score: 0', 100, 50);
 
 	</script>
 </body>
