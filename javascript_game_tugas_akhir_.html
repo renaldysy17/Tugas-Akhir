@@ -1,101 +1,117 @@
- <!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Tugas Akhir JavaScript Gamedev</title>
-	<style>
-		body{
-			display:  flex;
-			flex-direction: column;
-			align-items: center;
-			padding: 0;
-			margin: 0;
-			height: 100vh;
-		}
-	</style>
+    <meta charset="UTF-8">
+    <title>Tugas Akhir JavaScript Gamedev</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0;
+            margin: 0;
+            height: 100vh;
+        }
+    </style>
 </head>
 <body>
-	<h1>Game Shooting JavaScript</h1>
-	<canvas id="GL_Canvas" width="1024" height="768" style="background-color: black;border:1px solid black;"></canvas>
-	<script type="text/javascript">
-		//mengambil element canvas html dengan id GL_Canvas
-		var canvas = document.getElementById("GL_Canvas");
+<h1>Game Shooting JavaScript</h1>
+<canvas id="GL_Canvas" width="1024" height="768" style="background-color: black;border:1px solid black;"></canvas>
+<script type="text/javascript">
+  //mengambil element canvas html dengan id GL_Canvas
+  var canvas = document.getElementById("GL_Canvas")
 
-		//mengambil context 2d dari element canvas
-		var ctx = canvas.getContext("2d");
+  //mengambil context 2d dari element canvas
+  var ctx = canvas.getContext("2d")
 
-			var triangle = {
-			x: 100,
-			y: 100,
-			padding: 100,
-			vx: 5,
+  var moveSpeed = 10
 
-			color: 'blue',
+  var triangle = {
+    x: 0,
+    y: 0,
 
-			draw: function() {
-				ctx.beginPath();
-				ctx.lineTo(this.padding + this.x/2, this.padding);
-				ctx.lineTo(this.padding + this.x, this.y + this.padding);
-				ctx.lineTo(this.padding, this.y + this.x);
-				ctx.closePath();
-				ctx.fillStyle = this.color;
-				ctx.fill();
-			}
-		};
+    color: 'blue',
 
-		ctx.translate(-70, 550);
-		triangle.draw();
+    draw: function () {
+      ctx.beginPath()
+      // ctx.lineTo(this.padding + this.x/2, this.padding);
+      // ctx.lineTo(this.padding + this.x, this.y + this.padding);
+      // ctx.lineTo(this.padding, this.y + this.x);
+      ctx.lineTo(200 + this.x, 100 + this.y)
+      ctx.lineTo(170 + this.x, 150 + this.y)
+      ctx.lineTo(230 + this.x, 150 + this.y)
+      ctx.closePath()
+      ctx.fillStyle = this.color
+      ctx.fill()
+    }
+  }
 
-		//musuh berbentuk pentagon
-		var pentagon = {
-			x: 0,
-			y: 0,
+  // ctx.translate(-70, 550);
+  triangle.draw()
 
-			color: 'purple',
+  //musuh berbentuk pentagon
+  var pentagon = {
+    x: 0,
+    y: 0,
 
-			draw: function(radius) {
-				ctx.beginPath();
-				ctx.lineTo(this.x + 150, this.y + 100); //sudut ke-1
-				ctx.lineTo(this.x + 245, this.y + 169); //sudut ke-2
-				ctx.lineTo(this.x + 209, this.y + 281); //sudut ke-3
-				ctx.lineTo(this.x + 91, this.y + 281); //sudut ke-4
-				ctx.lineTo(this.x + 55, this.y + 169); //sudut ke-5
-				ctx.closePath();
-				ctx.fillStyle = this.color;
-				ctx.fill();
-			}
-		};
-		ctx.translate(780, -550);
-		pentagon.draw();
+    color: 'purple',
 
-		//menambahkan event listener down
-		window.addEventListener('keydown', (e) => {
+    draw: function (radius) {
+      ctx.beginPath()
+      ctx.lineTo(this.x + 150, this.y + 100) //sudut ke-1
+      ctx.lineTo(this.x + 245, this.y + 169) //sudut ke-2
+      ctx.lineTo(this.x + 209, this.y + 281) //sudut ke-3
+      ctx.lineTo(this.x + 91, this.y + 281) //sudut ke-4
+      ctx.lineTo(this.x + 55, this.y + 169) //sudut ke-5
+      ctx.closePath()
+      ctx.fillStyle = this.color
+      ctx.fill()
+    }
+  }
 
-			//menampilkan nama tombol keyboard di konsol yang baru saja ditekan
-			console.log(`keydown | Tombol "${e.key}" ditahan`);
+  // ctx.translate(780, -550);
+  pentagon.draw()
+  triangle.draw()
 
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
+  //menambahkan event listener down
+  window.addEventListener('keydown', (e) => {
 
-			//pengecekan apakah tombol yang baru saja ditekan adalah Tombol Arah Kanan
-			if (e.key === 'ArrowRight') {
-				triangle.x += triangle.vx;
-				triangle.padding += triangle.vx;
-			}
-			//pengecekan apakah tombol yang baru saja ditekan adalah Tombol Arah Kiri
-			if (e.key === 'ArrowLeft') {
-				triangle.x -= triangle.vx;
-				triangle.padding -= triangle.vx;
-			}
+    //menampilkan nama tombol keyboard di konsol yang baru saja ditekan
+    console.log(`keydown | Tombol "${e.key}" ditahan`)
 
-			//menggambarkan ulang lingkaran dengan nilai posisi x dan y baru
-			triangle.draw();
-		});
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    pentagon.draw()
 
-		ctx.fillStyle = "black";
-		ctx.font = '25px Arial';
-		ctx.fillText('High Score: 0', 100, 50);
+    //pengecekan apakah tombol yang baru saja ditekan adalah Tombol Arah Kanan
+    if (e.key === 'ArrowRight') {
+      triangle.x += moveSpeed
+    }
+    //pengecekan apakah tombol yang baru saja ditekan adalah Tombol Arah Kiri
+    if (e.key === 'ArrowLeft') {
+      triangle.x -= moveSpeed
+    }
 
-	</script>
+    if (e.key === 'ArrowDown') {
+      triangle.y += moveSpeed
+    }
+
+    if (e.key === 'ArrowUp') {
+      triangle.y -= moveSpeed
+    }
+
+    //menggambarkan ulang lingkaran dengan nilai posisi x dan y baru
+    triangle.draw()
+  })
+
+  ctx.fillStyle = "black"
+  ctx.font = '25px Arial'
+  ctx.fillText('High Score: 0', 100, 50)
+
+</script>
+</body>
+</html></title>
+</head>
+<body>
+
 </body>
 </html>
