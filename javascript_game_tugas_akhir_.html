@@ -11,7 +11,9 @@
             padding: 0;
             margin: 0;
             height: 100vh;
+            background-image: linear-gradient(90deg, purple, blue);
         }
+
     </style>
 </head>
 <body>
@@ -22,65 +24,106 @@
   var canvas = document.getElementById("GL_Canvas")
 
   //mengambil context 2d dari element canvas
-  var ctx = canvas.getContext("2d")
-
-  var moveSpeed = 10
+  var ctx = canvas.getContext("2d");
+  var moveSpeed = 10;
+  var velocity = 10;
 
   var triangle = {
-    x: 0,
-    y: 0,
+    x: -100,
+    y: 550,
 
     color: 'blue',
 
     draw: function () {
-      ctx.beginPath()
-      // ctx.lineTo(this.padding + this.x/2, this.padding);
-      // ctx.lineTo(this.padding + this.x, this.y + this.padding);
-      // ctx.lineTo(this.padding, this.y + this.x);
-      ctx.lineTo(200 + this.x, 100 + this.y)
-      ctx.lineTo(170 + this.x, 150 + this.y)
-      ctx.lineTo(230 + this.x, 150 + this.y)
-      ctx.closePath()
-      ctx.fillStyle = this.color
-      ctx.fill()
+      ctx.beginPath();
+      ctx.lineTo(200 + this.x, 100 + this.y);
+      ctx.lineTo(170 + this.x, 150 + this.y);
+      ctx.lineTo(230 + this.x, 150 + this.y);
+      ctx.closePath();
+      ctx.fillStyle = this.color;
+      ctx.fill();
     }
   }
 
-  // ctx.translate(-70, 550);
-  triangle.draw()
+ //triangle.draw();
 
   //musuh berbentuk pentagon
   var pentagon = {
-    x: 0,
+    x: 700,
     y: 0,
 
     color: 'purple',
 
-    draw: function (radius) {
+    draw: function () {
       ctx.beginPath()
-      ctx.lineTo(this.x + 150, this.y + 100) //sudut ke-1
-      ctx.lineTo(this.x + 245, this.y + 169) //sudut ke-2
-      ctx.lineTo(this.x + 209, this.y + 281) //sudut ke-3
-      ctx.lineTo(this.x + 91, this.y + 281) //sudut ke-4
-      ctx.lineTo(this.x + 55, this.y + 169) //sudut ke-5
-      ctx.closePath()
-      ctx.fillStyle = this.color
-      ctx.fill()
+      ctx.lineTo(150 + this.x, 100 + this.y); //sudut ke-1
+      ctx.lineTo(245 + this.x, 169 + this.y); //sudut ke-2
+      ctx.lineTo(209 + this.x, 281 + this.y); //sudut ke-3
+      ctx.lineTo(91 + this.x, 281 + this.y); //sudut ke-4
+      ctx.lineTo(55 + this.x, 169 + this.y); //sudut ke-5
+      ctx.closePath();
+      ctx.fillStyle = this.color;
+      ctx.fill();
     }
   }
 
-  // ctx.translate(780, -550);
-  pentagon.draw()
-  triangle.draw()
+  //tempat sprites
+  var sprites = [];
+
+  //membuat bullet
+  class bullet {
+      constructor() {
+        this.x = triangle/2;
+        this.y = triangle;
+        this.radius = 5;
+        this.color = 'red';
+        this.alive = true;
+        this.init = function () {
+            this.x += 5;
+            sprites.push(this);
+        };
+        this.renderBullet = function () {
+            if (this.alive) {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
+                ctx.closePath();
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+        };
+        this.updateBulletPos = function () {
+            if (this.alive) {
+                this.x += 7;
+                if (this.x > pentagon) {
+                    this.alive = false;
+                    high_score++;
+                }
+            }
+        };
+      }
+    }
+
+  //buat bullet
+  function createBullet() {
+    bullets = new bullet();
+    bullets.init();
+  }
+
+  //score awal
+  var score = 0;
+
+  //delay bullet
+  const delay = 250; 
+  var lastExecution = 0;
 
   //menambahkan event listener down
   window.addEventListener('keydown', (e) => {
 
     //menampilkan nama tombol keyboard di konsol yang baru saja ditekan
-    console.log(`keydown | Tombol "${e.key}" ditahan`)
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-    pentagon.draw()
+    console.log(`keydown | Tombol "${e.key}" ditahan`);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+   // pentagon.draw();
+   // high_score();
 
     //pengecekan apakah tombol yang baru saja ditekan adalah Tombol Arah Kanan
     if (e.key === 'ArrowRight') {
@@ -90,28 +133,58 @@
     if (e.key === 'ArrowLeft') {
       triangle.x -= moveSpeed
     }
-
-    if (e.key === 'ArrowDown') {
-      triangle.y += moveSpeed
+    //pengecekan apakah tombol yang baru saja ditekan adalah Tombol Arah Kiri
+    if (e.key === 'Space') {
+       if ((lastExecution + delay) < Date.now()){
+            createBullet();
+            lastExecution = Date.now() 
+         }
     }
-
-    if (e.key === 'ArrowUp') {
-      triangle.y -= moveSpeed
-    }
-
     //menggambarkan ulang lingkaran dengan nilai posisi x dan y baru
-    triangle.draw()
-  })
+   // triangle.draw();
+  });
 
-  ctx.fillStyle = "black"
-  ctx.font = '25px Arial'
-  ctx.fillText('High Score: 0', 100, 50)
+  //highscore
+  function high_score() {
+  ctx.fillStyle = "white"
+  ctx.font = '25px Comic Sans'
+  ctx.fillText('  High Score: 0', + score, 60, 250)
+  }
+  
+  //main game loop
+  function loop() {
+    updateBullet();
+    render();
+    requestAnimationFrame(loop);
+  }
+
+  function updateBullet() {
+    for (var indexBullet = sprites.length; indexBullet--;) {
+      sprites[indexBullet].updateBulletPos();
+    }
+  }
+
+  function render() {
+     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+     triangle.draw();
+
+     pentagon.draw();
+
+     high_score();
+
+     for (var indexBullet = sprites.length; indexBullet--;) {
+          sprites[indexBullet].renderBullet();
+      }
+  }
+
+  //mulai
+  requestAnimationFrame(loop);
+
+    high_score();
+    pentagon.draw();
+    triangle.draw();
 
 </script>
-</body>
-</html></title>
-</head>
-<body>
-
 </body>
 </html>
