@@ -25,65 +25,88 @@
 
   //mengambil context 2d dari element canvas
   var ctx = canvas.getContext("2d");
+
   var moveSpeed = 10;
   var velocity = 10;
 
-  var triangle = {
-    x: -100,
-    y: 550,
+  const background = new Image();
+  background.src = "images/space.png";
 
-    color: 'blue',
-
-    draw: function () {
-      ctx.beginPath();
-      ctx.lineTo(200 + this.x, 100 + this.y);
-      ctx.lineTo(170 + this.x, 150 + this.y);
-      ctx.lineTo(230 + this.x, 150 + this.y);
-      ctx.closePath();
-      ctx.fillStyle = this.color;
-      ctx.fill();
-    }
+  function game() {
+    ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
   }
 
- //triangle.draw();
+    var triangle = {
+        ytop: 750, 
+        xtop: canvas.width/2 - 45, 
+        ybottom: 750, 
+        xbottom: canvas.width/2 + 45, 
+        yface: 650, 
+        xface: canvas.width/2, 
+        vx: 5, vy: 2, 
+        color: 'blue',
+    
+    draw: function () {
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.moveTo(this.xtop, this.ytop);
+        ctx.lineTo(this.xbottom, this.ybottom);
+        ctx.lineTo(this.xface, this.yface);
+        ctx.closePath();
+        ctx.fill();
+        ctx.shadowColor = "#d53";
+        ctx.shadowBlur = 20;
+        ctx.lineJoin = "bevel";
+        ctx.lineWidth = 20;
+        }
+    };
 
   //musuh berbentuk pentagon
-  var pentagon = {
-    x: 700,
+    var pentagon = {
+    x: 100,
     y: 0,
+    point1: 560,
+    point2: 620,
+    point3: 590,
+    point4: 530,
+    point5: 500, 
+    grad1: 155, 
+    grad2: 260,
+    grad3: 260, 
+    grad4: 200,
+    grad5: 200, 
 
     color: 'purple',
 
     draw: function () {
-      ctx.beginPath()
-      ctx.lineTo(150 + this.x, 100 + this.y); //sudut ke-1
-      ctx.lineTo(245 + this.x, 169 + this.y); //sudut ke-2
-      ctx.lineTo(209 + this.x, 281 + this.y); //sudut ke-3
-      ctx.lineTo(91 + this.x, 281 + this.y); //sudut ke-4
-      ctx.lineTo(55 + this.x, 169 + this.y); //sudut ke-5
-      ctx.closePath();
-      ctx.fillStyle = this.color;
-      ctx.fill();
-    }
-  }
-
-  //tempat sprites
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.moveTo(this.point1, this.grad1);
+        ctx.lineTo(this.point5, this.grad5);
+        ctx.lineTo(this.point4, this.grad3);
+        ctx.lineTo(this.point3, this.grad2);
+        ctx.lineTo(this.point2, this.grad4);
+        ctx.closePath();
+        ctx.fill();
+        }
+    };
+  
   var sprites = [];
 
   //membuat bullet
   class bullet {
       constructor() {
-        this.x = triangle/2;
-        this.y = triangle;
+        this.x = triangle.xface;
+        this.y = triangle.yface;
         this.radius = 5;
         this.color = 'red';
-        this.alive = true;
+        this.shoot = true;
         this.init = function () {
-            this.x += 5;
+            this.y += 5;
             sprites.push(this);
         };
         this.renderBullet = function () {
-            if (this.alive) {
+            if (this.shoot) {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
                 ctx.closePath();
@@ -92,70 +115,114 @@
             }
         };
         this.updateBulletPos = function () {
-            if (this.alive) {
-                this.x += 7;
-                if (this.x > pentagon) {
-                    this.alive = false;
-                    high_score++;
+            if (this.shoot) {
+                this.y -= 7;
+                if (this.y <= pentagon.grad3) {
+                    this.shoot = false;
+                    score++;
+                }
+                else {
+                    this.shoot = true;
                 }
             }
         };
-      }
     }
+}
 
-  //buat bullet
-  function createBullet() {
+function createBullet() {
     bullets = new bullet();
     bullets.init();
-  }
+}
 
   //score awal
   var score = 0;
 
-  //delay bullet
-  const delay = 250; 
+  //delay bullet muncul
+  var delay = 150; 
   var lastExecution = 0;
 
-  //menambahkan event listener down
+  function highScore() {
+    ctx.fillStyle = 'white';
+    ctx.font = '30px Comic Sans';
+    ctx.fillText('High Score : ' + score, 40, 80);
+}
+
+  //variable untuk kontroller segitiga
+  var shootPressed = false;
+  var rightPressed = false;
+  var leftPressed = false;
+
   window.addEventListener('keydown', (e) => {
+      if (e.keyCode == 32 ) {
+         shootPressed = true;
+     }
 
-    //menampilkan nama tombol keyboard di konsol yang baru saja ditekan
-    console.log(`keydown | Tombol "${e.key}" ditahan`);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-   // pentagon.draw();
-   // high_score();
+      if (e.key === 'ArrowRight') {
+         rightPressed = true;
+      }
 
-    //pengecekan apakah tombol yang baru saja ditekan adalah Tombol Arah Kanan
-    if (e.key === 'ArrowRight') {
-      triangle.x += moveSpeed
-    }
-    //pengecekan apakah tombol yang baru saja ditekan adalah Tombol Arah Kiri
-    if (e.key === 'ArrowLeft') {
-      triangle.x -= moveSpeed
-    }
-    //pengecekan apakah tombol yang baru saja ditekan adalah Tombol Arah Kiri
-    if (e.key === 'Space') {
-       if ((lastExecution + delay) < Date.now()){
-            createBullet();
-            lastExecution = Date.now() 
-         }
-    }
-    //menggambarkan ulang lingkaran dengan nilai posisi x dan y baru
-   // triangle.draw();
+      if (e.key === 'ArrowLeft') {
+          leftPressed = true;
+      }
+
   });
 
-  //highscore
-  function high_score() {
-  ctx.fillStyle = "white"
-  ctx.font = '25px Comic Sans'
-  ctx.fillText('  High Score: 0', + score, 60, 250)
+  window.addEventListener('keyup', (e) => {
+      if (e.keyCode == 32 ) {
+        shootPressed = false;
+     }
+
+     if (e.key === 'ArrowLeft') {
+        leftPressed = false;
+     }
+
+     if (e.key === 'ArrowRight') {
+        rightPressed = false;
+      }
+  });
+
+  function triangleMove() {
+      if (shootPressed == true) {
+          if ((lastExecution + delay) < Date.now()){
+              createBullet();
+              lastExecution = Date.now() 
+          }
+      }
+      if (rightPressed == true) {
+         if (triangle.xface < canvas.width - 50) {
+             triangle.xface += triangle.vx;
+             triangle.xtop += triangle.vx;
+             triangle.xbottom += triangle.vx;
+          }
+     }
+
+     if (leftPressed == true) {
+          if (triangle.xtop > 0) {
+              triangle.xface -= triangle.vx;
+              triangle.xtop -= triangle.vx;
+              triangle.xbottom -= triangle.vx;
+          }
+      }
   }
-  
-  //main game loop
+
   function loop() {
+    game();
     updateBullet();
+    triangleMove();
     render();
     requestAnimationFrame(loop);
+  }
+
+function render() {
+     ctx.clearRect(0, 0, canvas.width, canvas.height);
+     game();
+     triangle.draw();
+     pentagon.draw();
+     highScore();
+
+     for (var indexBullet = sprites.length; indexBullet--;) {
+          sprites[indexBullet].renderBullet();
+      }
   }
 
   function updateBullet() {
@@ -164,26 +231,7 @@
     }
   }
 
-  function render() {
-     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-     triangle.draw();
-
-     pentagon.draw();
-
-     high_score();
-
-     for (var indexBullet = sprites.length; indexBullet--;) {
-          sprites[indexBullet].renderBullet();
-      }
-  }
-
-  //mulai
   requestAnimationFrame(loop);
-
-    high_score();
-    pentagon.draw();
-    triangle.draw();
 
 </script>
 </body>
