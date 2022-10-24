@@ -93,6 +93,21 @@
   
   var sprites = [];
 
+  //collision detection
+  function isBulletsCollideWithPentagon(bulletsParam, pentagonParam){
+    let collided = false;
+
+    if (bulletsParam.y > pentagonParam.y + pentagonParam.height &&
+        bulletsParam.x + bulletsParam.width > pentagonParam.x &&
+        bulletsParam.x < pentagonParam.x + pentagonParam.width &&
+        bulletsParam.y + bulletsParam.height > pentagonParam.y
+        ) 
+        {
+            collided = true;
+        }
+        return collided;
+    };
+
   //membuat bullet
   class bullet {
       constructor() {
@@ -116,12 +131,12 @@
         };
         this.updateBulletPos = function () {
             if (this.shoot) {
-                this.y -= 7;
-                if (this.y <= pentagon.grad3) {
+                this.y -= 8;
+                //if (isBulletsCollideWithPentagon(bullets, pentagon)) {
+                if(this.y < pentagon.grad3){
                     this.shoot = false;
                     score++;
-                }
-                else {
+                } else {
                     this.shoot = true;
                 }
             }
@@ -230,6 +245,7 @@ function render() {
       sprites[indexBullet].updateBulletPos();
     }
   }
+
 
   requestAnimationFrame(loop);
 
